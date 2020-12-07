@@ -22,3 +22,6 @@ CH4 + O2 => CO2 + H2O
 
 ## Distributions
 You can clone this repository and execute ```CHEB.py``` or download ```CHEB.exe``` from the [releases](https://github.com/AdinAck/Chemistry-Equation-Balancer/releases) section of this repository.
+
+## Learn
+Learn about how CHEB works on the [wiki](https://github.com/AdinAck/Chemistry-Equation-Balancer/wiki).

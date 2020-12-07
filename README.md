@@ -1,10 +1,11 @@
 # Chemistry Equation Balancer
- A small python tool that can solve *n* dimentional balancing equations.
+ A small python tool that can solve *n* dimensional balancing equations.
 ***
 ## Dependencies
+*only when using source code*
  - [Numpy](https://numpy.org/)
  - [Sympy](https://www.sympy.org/en/index.html)
- 
+
  To quickly install the dependencies simply execute
  ```
  pip install -r requirements.txt

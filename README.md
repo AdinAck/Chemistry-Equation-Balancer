@@ -15,7 +15,7 @@
 ## Usage
 Here are 3 example equations with correct formatting:
 ```
-H + O => H2O
+H + O2 => H2O
 CH4 + O2 => CO2 + H2O
 (NH4)2CO3 + NaOH => Na2CO3 + NH3 + H2O
 ```

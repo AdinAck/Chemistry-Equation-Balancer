@@ -21,4 +21,4 @@ CH4 + O2 => CO2 + H2O
 ```
 
 ## Distributions
-You can clone this repository and execute ```main.py``` or download the .exe package from the packages section of this repository.
+You can clone this repository and execute ```main.py``` or download the .exe package from the releases section of this repository.

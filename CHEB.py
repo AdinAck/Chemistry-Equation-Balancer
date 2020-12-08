@@ -114,13 +114,15 @@ except IndexError:
     printMsg("Failed to balance equation:\nNo solution exists.")
     exit()
 
-fracts = [i[1] for i in [fraction(j) for j in ns] if i[1] != 1]
-if len(fracts) == 0:
-    denominator = 1
-else:
-    denominator = max(fracts)
-
-coeffs = [j * denominator for j in ns]
+coeffs = ns
+while True:
+    fracts = [i[1] for i in [fraction(j) for j in coeffs] if i[1] != 1]
+    if len(fracts) == 0:
+        denominator = 1
+        break
+    else:
+        denominator = max(fracts)
+    coeffs = [j * denominator for j in coeffs]
 if 0 in coeffs:
     printMsg("Failed to balance equation:\nNo solution exists.")
     exit()

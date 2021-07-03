@@ -17,14 +17,16 @@ def solve(eq):
 
     for i in n:
         char = eq[i]
-        if char not in exclude:
-            if char == char.upper():
-                if eq[i-1] not in "( ":
-                    eq = eq[:i] + " " + eq[i:]
-                    n += [len(eq)-1]
+        if (
+            char not in exclude
+            and char == char.upper()
+            and eq[i - 1] not in "( "
+        ):
+            eq = eq[:i] + " " + eq[i:]
+            n += [len(eq)-1]
 
     for char in eq:
-        if not ((char.isdigit() or char.isalpha()) or char in "() +=>"):
+        if not char.isdigit() and not char.isalpha() and char not in "() +=>":
             printMsg(f"[{eq}]:\nEquation is not formatted correctly:\nIllegal characters ({char}).")
             exit()
 
@@ -37,12 +39,17 @@ def solve(eq):
             componentsDict[i].append({})
 
     alphabet = list(
-        dict.fromkeys([
-            i for i in "".join([
-                i for i in eq if i not in "()+=>" and not i.isdigit()
-            ]).split(" ") if i != ""
-        ])
+        dict.fromkeys(
+            [
+                i
+                for i in "".join(
+                    i for i in eq if i not in "()+=>" and not i.isdigit()
+                ).split(" ")
+                if i != ""
+            ]
+        )
     )
+
 
     for i in range(len(components)):
         for j in range(len(components[i])):
@@ -61,28 +68,21 @@ def solve(eq):
                     for l in range(end+1,len(components[i][j])):
                         if components[i][j][l] == " ":
                             break
-                        else:
-                            val = int(components[i][j][end+1:l+1])
-                            valEnd = l+1
+                        val = int(components[i][j][end+1:l+1])
+                        valEnd = l+1
                     for l in components[i][j][start:end].split(" "):
-                        num = "".join([i for i in l if i.isdigit()])
-                        if num == "":
-                            num = 1
-                        else:
-                            num = int(num)
-                        componentsDict[i][j]["".join([i for i in l if not i.isdigit()])] += num*val
+                        num = "".join(i for i in l if i.isdigit())
+                        num = 1 if num == "" else int(num)
+                        componentsDict[i][j]["".join(i for i in l if not i.isdigit())] += num*val
                     components[i][j] = components[i][j][:start-1]+" "*(valEnd-start+1)+components[i][j][valEnd:]
 
     for i in range(len(components)):
         for j in range(len(components[i])):
             for k in components[i][j].split(" "):
                 if k != "":
-                    e = "".join([char for char in k if not char.isdigit()])
-                    num = "".join([char for char in k if char.isdigit()])
-                    if num == "":
-                        num = 1
-                    else:
-                        num = int(num)
+                    e = "".join(char for char in k if not char.isdigit())
+                    num = "".join(char for char in k if char.isdigit())
+                    num = 1 if num == "" else int(num)
                     try:
                         componentsDict[i][j][e] += num
                     except KeyError:
@@ -91,10 +91,7 @@ def solve(eq):
 
     matrix = np.zeros((len(alphabet),len(components[0])+len(components[1])))
 
-    lut = {}
-    for i in range(len(alphabet)-1,-1,-1):
-        lut[alphabet[i]] = i
-
+    lut = {alphabet[i]: i for i in range(len(alphabet)-1,-1,-1)}
     for i in range(len(componentsDict)):
         for j in range(len(componentsDict[i])):
             for e,v in componentsDict[i][j].items():
@@ -116,7 +113,7 @@ def solve(eq):
     coeffs = ns
     while True:
         fracts = [i[1] for i in [fraction(j) for j in coeffs] if i[1] != 1]
-        if len(fracts) == 0:
+        if not fracts:
             denominator = 1
             break
         else:
@@ -127,18 +124,20 @@ def solve(eq):
         exit()
     ca = coeffs[:len(componentsDict[0])],coeffs[len(componentsDict[0]):]
 
-    result = " => ".join([
-        " + ".join([
-            f'{k}{j.replace(" ", "")}' if k != 1 else j.replace(" ", "") for j,k in zip(i, ca[n])
-        ]) for i,n in zip(componentsOriginal, [0,1])
-    ])
+    result = " => ".join(
+        " + ".join(
+            f'{k}{j.replace(" ", "")}' if k != 1 else j.replace(" ", "")
+            for j, k in zip(i, ca[n])
+        )
+        for i, n in zip(componentsOriginal, [0, 1])
+    )
+
     if fancy:
         printMsg(f"Coeffs: {coeffs}\nEquation: " + result)
+    elif full:
+        return result
     else:
-        if full:
-            return result
-        else:
-            return coeffs
+        return coeffs
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
@@ -147,10 +146,10 @@ if __name__ == "__main__":
         solve(eq)
     else:
         fancy = False
-        full = True if "--full" in sys.argv else False
+        full = "--full" in sys.argv
 
-        file = True if "-f" in sys.argv else False
-        out = True if "-o" in sys.argv else False
+        file = "-f" in sys.argv
+        out = "-o" in sys.argv
 
         if file:
             with open(sys.argv[sys.argv.index('-f')+1]) as f:

@@ -6,12 +6,14 @@ import sys
 import numpy as np
 from sympy import Matrix, fraction
 
+
 def printMsg(msg):
     print("\n/////////////////////////\n")
     print(msg)
     print("\n/////////////////////////")
 
-def solve(eq):
+
+def solve(eq):  # sourcery no-metrics
     exclude = [str(i) for i in range(10)]+[")", "+", "=", ">", " "]
     n = list(range(1, len(eq)))
 
@@ -27,14 +29,15 @@ def solve(eq):
 
     for char in eq:
         if not char.isdigit() and not char.isalpha() and char not in "() +=>":
-            printMsg(f"[{eq}]:\nEquation is not formatted correctly:\nIllegal characters ({char}).")
+            printMsg(
+                f"[{eq}]:\nEquation is not formatted correctly:\nIllegal characters ({char}).")
             exit()
 
     components = [i.split(" + ") for i in eq.split(' => ')]
     componentsOriginal = [i.split(" + ") for i in eq.split(' => ')]
 
-    componentsDict = [[],[]]
-    for i in [0,1]:
+    componentsDict = [[], []]
+    for i in [0, 1]:
         for _ in range(len(components[i])):
             componentsDict[i].append({})
 
@@ -50,7 +53,6 @@ def solve(eq):
         )
     )
 
-
     for i in range(len(components)):
         for j in range(len(components[i])):
             for k in alphabet:
@@ -59,13 +61,13 @@ def solve(eq):
 
     for i in range(len(components)):
         for j in range(len(components[i])):
-            start, end = -1,-1
+            start, end = -1, -1
             for k in range(len(components[i][j])):
                 if components[i][j][k] == "(":
                     start = k+1
                 elif components[i][j][k] == ")":
                     end = k
-                    for l in range(end+1,len(components[i][j])):
+                    for l in range(end+1, len(components[i][j])):
                         if components[i][j][l] == " ":
                             break
                         val = int(components[i][j][end+1:l+1])
@@ -73,8 +75,10 @@ def solve(eq):
                     for l in components[i][j][start:end].split(" "):
                         num = "".join(i for i in l if i.isdigit())
                         num = 1 if num == "" else int(num)
-                        componentsDict[i][j]["".join(i for i in l if not i.isdigit())] += num*val
-                    components[i][j] = components[i][j][:start-1]+" "*(valEnd-start+1)+components[i][j][valEnd:]
+                        componentsDict[i][j]["".join(
+                            i for i in l if not i.isdigit())] += num*val
+                    components[i][j] = components[i][j][:start-1] + \
+                        " "*(valEnd-start+1)+components[i][j][valEnd:]
 
     for i in range(len(components)):
         for j in range(len(components[i])):
@@ -86,26 +90,28 @@ def solve(eq):
                     try:
                         componentsDict[i][j][e] += num
                     except KeyError:
-                        printMsg(f"[{eq}]:\nEquation is not formatted correctly:\nContains coefficients.")
+                        printMsg(
+                            f"[{eq}]:\nEquation is not formatted correctly:\nContains coefficients.")
                         exit()
 
-    matrix = np.zeros((len(alphabet),len(components[0])+len(components[1])))
+    matrix = np.zeros((len(alphabet), len(components[0])+len(components[1])))
 
-    lut = {alphabet[i]: i for i in range(len(alphabet)-1,-1,-1)}
+    lut = {alphabet[i]: i for i in range(len(alphabet)-1, -1, -1)}
     for i in range(len(componentsDict)):
         for j in range(len(componentsDict[i])):
-            for e,v in componentsDict[i][j].items():
+            for e, v in componentsDict[i][j].items():
                 # print(i,j,e,v)
-                matrix[lut[e],j+i*len(componentsDict[0])] = v
+                matrix[lut[e], j+i*len(componentsDict[0])] = v
 
-    m1 = matrix[:,:len(componentsDict[0])]
-    m2 = matrix[:,len(componentsDict[0]):]
+    m1 = matrix[:, :len(componentsDict[0])]
+    m2 = matrix[:, len(componentsDict[0]):]
     m2 = -m2
 
-    matrix = np.concatenate((m1,m2), axis=1)
+    matrix = np.concatenate((m1, m2), axis=1)
 
     try:
-        ns = [i[0] for i in np.array(Matrix([[int(j) for j in list(i)] for i in matrix]).nullspace())[0]]
+        ns = [i[0] for i in np.array(
+            Matrix([[int(j) for j in list(i)] for i in matrix]).nullspace())[0]]
     except IndexError:
         printMsg(f"[{eq}]:\nFailed to balance equation:\nNo solution exists.")
         exit()
@@ -122,7 +128,7 @@ def solve(eq):
     if 0 in coeffs:
         printMsg(f"[{eq}]:\nFailed to balance equation:\nNo solution exists.")
         exit()
-    ca = coeffs[:len(componentsDict[0])],coeffs[len(componentsDict[0]):]
+    ca = coeffs[:len(componentsDict[0])], coeffs[len(componentsDict[0]):]
 
     result = " => ".join(
         " + ".join(
@@ -138,6 +144,7 @@ def solve(eq):
         return result
     else:
         return coeffs
+
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
